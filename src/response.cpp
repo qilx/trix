@@ -26,19 +26,30 @@ void Response::setContentLength(long contentLength) {
 void Response::addHeader(const std::string name, const std::string value) {
 	this->headers.push_back(std::make_pair(name, value));
 }
-/*
-void Response::addContent(const std::string data) {
 
-	std::ostream os(&this->content);
-	os << data;
+void Response::write(const char * data, const std::size_t length) {
 
 	if (this->contentLength == -1) {
-		this->contentLength = 0;
+
+		std::ostream os(&this->content);
+		os.write(data, length);
+
+	} else {
+
+		if (!this->written) {
+			this->writeHeaders();
+		}
+
+		boost::asio::streambuf streambuf;
+		std::ostream os(&streambuf);
+
+		os.write(data, length);
+
+		this->socket.send(streambuf.data());
 	}
 
-	this->contentLength += data.length();
 }
-*/
+
 void Response::writeHeaders() {
 
 	this->written = true;
@@ -76,24 +87,7 @@ void Response::writeContent() {
 
 Response & Response::operator<<(const std::string & data) {
 
-	if (this->contentLength == -1) {
-
-		std::ostream os(&this->content);
-		os << data;
-
-	} else {
-
-		if (!this->written) {
-			this->writeHeaders();
-		}
-
-		boost::asio::streambuf streambuf;
-		std::ostream os(&streambuf);
-
-		os << data;
-
-		this->socket.send(streambuf.data());
-	}
+	this->write(data.c_str(), data.size());
 
 	return *this;
 }

@@ -67,7 +67,7 @@ class Response {
 		void addHeader(const std::string, const std::string);
 
 		Response & operator<<(const std::string & data);
-		//void write(const char * data, std::size_t length);
+		void write(const char * data, const std::size_t length);
 
 		bool isWritten();
 

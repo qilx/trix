@@ -22,6 +22,20 @@ void test(const trix::Request & request, trix::Response & response) {
 
 }
 
+void testAttachment(const trix::Request & request, trix::Response & response) {
+
+	std::string filename = request.getUriParams().at("filename");
+
+	std::string data = "super test of attachment downlaod using trix!";
+
+	response.setContentType("text/plain");
+	response.addHeader("Content-Disposition", "attachment; filename=" + filename);
+	response.setContentLength(data.size());
+
+	response.write(data.c_str(), data.size());
+
+}
+
 int main() {
 
 	using namespace trix;
@@ -34,6 +48,7 @@ int main() {
 	Server server("0.0.0.0", "8083");
 	server.addHandlerMapping("/", baseHandler);
 	server.addMapping("/bla/(?<test>huh)(?<test2>.*)/", boost::bind(test, _1, _2));
+	server.addMapping("/static/(?<filename>[^/]+\\.txt)", boost::bind(testAttachment, _1, _2));
 	server.run();
 
 }
