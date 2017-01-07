@@ -1,0 +1,29 @@
+
+Import('env')
+
+env = env.Clone()
+
+libSources = [
+    'utils/uri.cpp',
+    'common.cpp',
+    'server.cpp',
+    'connection_manager.cpp',
+    'connection.cpp', 
+    'request.cpp', 
+    'request_parser.cpp',
+    'response.cpp',
+    'handler.cpp',
+    'dispatcher.cpp',
+]
+
+
+env.Library('trix', libSources)
+env.SharedLibrary('trix', libSources)
+
+env.Program(
+    'example/server', 
+    [
+        'example/server_example.cpp', 
+        'libtrix.a'
+    ]
+)

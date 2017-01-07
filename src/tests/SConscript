@@ -1,0 +1,9 @@
+
+Import('env')
+
+env = env.Clone()
+
+#env.Object('uri', ['uri.cpp'])
+#env.Object('server', ['server.cpp'])
+env.Program('uri', ['main.cpp', 'uri.cpp', '#build/uri.o'])
+env.Program('server', ['main.cpp', 'server.cpp', '#build/server.o'])
