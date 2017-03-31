@@ -6,6 +6,7 @@
 #include <map>
 
 #include "common.hpp"
+#include "utils/querydict.hpp"
 
 namespace trix {
 
@@ -16,7 +17,7 @@ class Request {
 		friend class RequestParser;
 
 		std::string remoteHostname;
-		unsigned short remotePort;
+		unsigned short remotePort = 0;
 
 		std::string protocol;
 		Method method;
@@ -27,8 +28,10 @@ class Request {
 
 		std::list<std::pair<std::string, std::string>> headers;
 
-		std::map<std::string, std::string> getParams;
 		std::map<std::string, std::string> uriParams;
+		utils::QueryDict getParams;
+		utils::QueryDict postParams;
+
 		// cookies
 		// files
 		// get data
@@ -37,11 +40,6 @@ class Request {
 		// input
 
 	public:
-
-		//Request(const Request&) = delete;
-		//Request& operator=(const Request&) = delete;
-
-		Request();
 
 		const std::string & getRemoteHostname() const;
 		const unsigned short getRemotePort() const;
@@ -52,7 +50,8 @@ class Request {
 		const std::string & getQuery() const;
 		const std::string & getAnchor() const;
 		const std::map<std::string, std::string> & getUriParams() const;
-		const std::map<std::string, std::string> & getGetParams() const;
+		const utils::QueryDict & getGetParams() const;
+		const utils::QueryDict & getPostParams() const;
 
 };
 

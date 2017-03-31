@@ -101,39 +101,13 @@ void RequestParser::parseGetParams(Request & request) {
 		return;
 	}
 
-	const std::string & query = request.query;
+	request.getParams.load(request.query);
 
-	std::size_t start = 0;
-	std::size_t end = query.size();
+}
 
-	bool run = true;
-	while (run) {
+void RequestParser::parsePostParams(Request & request, std::shared_ptr<Connection> connection) {
 
-		std::size_t paramEnd = query.find("&", start);
-
-		if (paramEnd == std::string::npos) {
-			paramEnd = end;
-			run = false;
-		}
-
-		std::size_t paramSeparator = query.find("=", start);
-		if (paramSeparator == std::string::npos) {
-			paramSeparator = end;
-		}
-
-		std::string key = query.substr(start, paramSeparator - start);
-		key = utils::Uri::decode(key);
-
-		std::string val;
-		if (paramSeparator < paramEnd) {
-			val = query.substr(paramSeparator + 1, paramEnd - paramSeparator - 1);
-			val = utils::Uri::decode(val);
-		}
-
-		request.getParams[key] = val;
-
-		start = paramEnd + 1;
-	}
+	// TODO
 
 }
 

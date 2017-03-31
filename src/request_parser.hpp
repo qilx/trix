@@ -8,6 +8,7 @@
 
 #include "handler.hpp"
 #include "request.hpp"
+#include "utils/querydict.hpp"
 
 namespace trix {
 
@@ -20,6 +21,8 @@ class RequestParser {
 		void parseRequestData(Request & request, std::string & data);
 		void parseHeaders(Request & request, std::string & data);
 		void parseGetParams(Request & request);
+		void parsePostParams(Request & request, std::shared_ptr<Connection> connection);
+		void parseQueryString(utils::QueryDict & queryDict, const std::string & queryString);
 		bool getline(std::string &data, std::string &line);
 
 	public:

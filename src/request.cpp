@@ -3,8 +3,6 @@
 
 namespace trix {
 
-Request::Request(): remotePort(0) {}
-
 const std::string & Request::getRemoteHostname() const {
 	return this->remoteHostname;
 }
@@ -41,8 +39,12 @@ const std::map<std::string, std::string> & Request::getUriParams() const {
 	return this->uriParams;
 }
 
-const std::map<std::string, std::string> & Request::getGetParams() const {
+const utils::QueryDict & Request::getGetParams() const {
 	return this->getParams;
+}
+
+const utils::QueryDict & Request::getPostParams() const {
+	return this->postParams;
 }
 
 } /* namespace trix */
