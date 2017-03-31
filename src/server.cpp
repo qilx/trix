@@ -64,7 +64,7 @@ void Server::doAccept() {
 	//auto socket = std::make_shared<boost::asio::ip::tcp::socket>(this->ioService);
 	std::shared_ptr<Connection> connection = std::make_shared<Connection>(this->connectionManager, this->ioService);
 
-	this->acceptor.async_accept(connection->getSocket(),
+	this->acceptor.async_accept(connection->socket,
 	    [this, connection](boost::system::error_code ec)
 	    {
 			// Check whether the server was stopped by a signal before this
@@ -88,13 +88,11 @@ void Server::doAccept() {
 
 void Server::doRead(std::shared_ptr<Connection> connection) {
 
-	auto streambuf = std::make_shared<boost::asio::streambuf>();
-
 	//Set timeout on the following boost::asio::async-read or write function
 	std::shared_ptr<boost::asio::deadline_timer> timer = this->getTimeoutTimer(connection);
 
-	boost::asio::async_read_until(connection->getSocket(), *streambuf, DATA_SEPARATOR,
-	    [this, streambuf, timer, connection](const boost::system::error_code& ec, size_t bytes_transferred) {
+	boost::asio::async_read_until(connection->socket, connection->streambuf, DATA_SEPARATOR,
+	    [this, timer, connection](const boost::system::error_code& ec, size_t bytes_transferred) {
 
 			if(timer) {
 	            timer->cancel();
@@ -102,11 +100,29 @@ void Server::doRead(std::shared_ptr<Connection> connection) {
 
 	        if(!ec) {
 
-	        	std::shared_ptr<std::string> data = std::make_shared<std::string>( (std::istreambuf_iterator<char>(streambuf.get())), std::istreambuf_iterator<char>() );
+	        	const char* data = boost::asio::buffer_cast<const char*>(connection->streambuf.data());
 
-	        	//std::shared_ptr<RequestMappingResult> mappingResult = this->getHandler().handle(*data);
+	        	std::shared_ptr<std::string> headers = std::make_shared<std::string>(data, bytes_transferred - DATA_SEPARATOR.length());
+	        	connection->streambuf.consume(bytes_transferred);
+/*
+	        	std::cout << "Headers: \"\"\"" << std::endl;
+	        	std::cout << *headers;
+	        	std::cout << std::endl << "\"\"\"";
+	        	std::cout << std::endl;
 
-	        	this->dispatcher.dispatch(connection, data);
+	        	std::size_t size = connection->streambuf.size();
+
+	        	std::string rest(
+	        		std::istreambuf_iterator<char>(&connection->streambuf),
+	        		std::istreambuf_iterator<char>()
+	        	);
+
+	        	std::cout << "Rest: (" << size << ") \"\"\"" << std::endl;
+	        	std::cout << rest;
+	        	std::cout << std::endl << "\"\"\"";
+	        	std::cout << std::endl;
+*/
+	        	this->dispatcher.dispatch(connection, headers);
 
 	        }
 

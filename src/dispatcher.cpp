@@ -22,8 +22,8 @@ void Dispatcher::doDispatch(std::shared_ptr<Connection> connection, std::shared_
 
 	std::shared_ptr<RequestMappingResult> mapping = this->handler.handle(*data);
 
-	Request request = this->requestParser.parse(connection->getSocket(), *data, mapping);
-	Response response(connection->getSocket(), request);
+	Request request = this->requestParser.parse(connection, *data, mapping);
+	Response response(connection->socket, request);
 
 	try {
 

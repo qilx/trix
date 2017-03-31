@@ -14,15 +14,15 @@ const std::string RequestParser::LINE_DELIMITER = "\r\n";
 
 RequestParser::RequestParser() {}
 
-Request RequestParser::parse(const boost::asio::ip::tcp::socket & socket, std::string data, std::shared_ptr<RequestMappingResult> mapping) {
+Request RequestParser::parse(std::shared_ptr<Connection> connection, std::string data, std::shared_ptr<RequestMappingResult> mapping) {
 
 	Request request;
 
 	if (mapping) {
-	request.uriParams = mapping->uriParams;
+		request.uriParams = mapping->uriParams;
 	}
 
-	this->parseRemoteData(request, socket);
+	this->parseRemoteData(request, connection);
 	this->parseRequestData(request, data);
 	this->parseHeaders(request, data);
 	this->parseGetParams(request);
@@ -30,10 +30,10 @@ Request RequestParser::parse(const boost::asio::ip::tcp::socket & socket, std::s
 	return request;
 }
 
-void RequestParser::parseRemoteData(Request & request, const boost::asio::ip::tcp::socket & socket) {
+void RequestParser::parseRemoteData(Request & request, std::shared_ptr<Connection> connection) {
 
-	std::string remoteHostname = socket.lowest_layer().remote_endpoint().address().to_string();
-	unsigned short remotePort = socket.lowest_layer().remote_endpoint().port();
+	std::string remoteHostname = connection->socket.lowest_layer().remote_endpoint().address().to_string();
+	unsigned short remotePort = connection->socket.lowest_layer().remote_endpoint().port();
 
 	request.remoteHostname = remoteHostname;
 	request.remotePort     = remotePort;

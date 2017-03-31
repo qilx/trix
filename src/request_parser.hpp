@@ -16,7 +16,7 @@ class RequestParser {
 	private:
 		static const std::string LINE_DELIMITER;
 
-		void parseRemoteData(Request & request, const boost::asio::ip::tcp::socket & socket);
+		void parseRemoteData(Request & request, std::shared_ptr<Connection> connection);
 		void parseRequestData(Request & request, std::string & data);
 		void parseHeaders(Request & request, std::string & data);
 		void parseGetParams(Request & request);
@@ -29,7 +29,7 @@ class RequestParser {
 
 		RequestParser();
 
-		Request parse(const boost::asio::ip::tcp::socket & socket, std::string data, std::shared_ptr<RequestMappingResult> mapping);
+		Request parse(std::shared_ptr<Connection> connection, std::string data, std::shared_ptr<RequestMappingResult> mapping);
 
 };
 
