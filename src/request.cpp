@@ -35,6 +35,10 @@ const std::string & Request::getAnchor() const {
 	return this->anchor;
 }
 
+const std::map<std::string, std::string> & Request::getHeaders() const {
+	return this->headers;
+}
+
 const std::map<std::string, std::string> & Request::getUriParams() const {
 	return this->uriParams;
 }

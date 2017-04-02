@@ -20,6 +20,11 @@ void test(const trix::Request & request, trix::Response & response) {
 		response << entry.first << " = " << entry.second << "<br />\r\n";
 	}
 
+	response << "<br />\r\nPost params:<br />\r\n";
+	for (auto const & entry : request.getPostParams()) {
+		response << entry.first << " = " << entry.second << "<br />\r\n";
+	}
+
 }
 
 void testAttachment(const trix::Request & request, trix::Response & response) {

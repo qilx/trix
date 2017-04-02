@@ -26,6 +26,7 @@ Request RequestParser::parse(std::shared_ptr<Connection> connection, std::string
 	this->parseRequestData(request, data);
 	this->parseHeaders(request, data);
 	this->parseGetParams(request);
+	this->parsePostParams(request, connection);
 
 	return request;
 }
@@ -89,7 +90,7 @@ void RequestParser::parseHeaders(Request & request, std::string & data) {
 		std::string key = line.substr(0, keyEnd);
 		std::string value = line.substr(valueStart + 1);
 
-		request.headers.push_back(std::make_pair(key, value));
+		request.headers[key] = value;
 
 	}
 
@@ -107,7 +108,41 @@ void RequestParser::parseGetParams(Request & request) {
 
 void RequestParser::parsePostParams(Request & request, std::shared_ptr<Connection> connection) {
 
-	// TODO
+	/*
+	Content-Type: application/x-www-form-urlencoded
+	Content-Length: 13
+	*/
+
+	if (request.headers.find("Content-Type") == request.headers.end()) {
+		return;
+	}
+
+	if (request.headers["Content-Type"].compare("application/x-www-form-urlencoded") != 0) {
+		return;
+	}
+
+	if (request.headers.find("Content-Length") == request.headers.end()) {
+		return;
+	}
+
+	std::size_t contentLength;
+
+	std::stringstream contentLengthStream(request.headers["Content-Length"]);
+	contentLengthStream >> contentLength;
+
+	if (contentLength <= 0) {
+		return;
+	}
+
+	boost::asio::streambuf streambuf;
+
+	connection->receive(streambuf, contentLength); // blocking call
+
+	std::ostringstream ss;
+	ss << &streambuf;
+	std::string data = ss.str();
+
+	request.postParams.load(data);
 
 }
 
@@ -116,7 +151,9 @@ bool RequestParser::getline(std::string &data, std::string &line) {
 	std::size_t i = data.find(LINE_DELIMITER);
 
 	if (i == std::string::npos) {
-		return false;
+		line = data.substr(0);
+		data.erase(0);
+		return true;
 	}
 
 	line = data.substr(0, i);

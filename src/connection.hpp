@@ -26,6 +26,8 @@ public:
 
 	Connection(ConnectionManager & connectionManager, boost::asio::io_service & ioService);
 
+	void receive(boost::asio::streambuf & streambuf, std::size_t length);
+
 	bool isOpen();
 	void close();
 

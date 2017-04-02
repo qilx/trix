@@ -104,24 +104,7 @@ void Server::doRead(std::shared_ptr<Connection> connection) {
 
 	        	std::shared_ptr<std::string> headers = std::make_shared<std::string>(data, bytes_transferred - DATA_SEPARATOR.length());
 	        	connection->streambuf.consume(bytes_transferred);
-/*
-	        	std::cout << "Headers: \"\"\"" << std::endl;
-	        	std::cout << *headers;
-	        	std::cout << std::endl << "\"\"\"";
-	        	std::cout << std::endl;
 
-	        	std::size_t size = connection->streambuf.size();
-
-	        	std::string rest(
-	        		std::istreambuf_iterator<char>(&connection->streambuf),
-	        		std::istreambuf_iterator<char>()
-	        	);
-
-	        	std::cout << "Rest: (" << size << ") \"\"\"" << std::endl;
-	        	std::cout << rest;
-	        	std::cout << std::endl << "\"\"\"";
-	        	std::cout << std::endl;
-*/
 	        	this->dispatcher.dispatch(connection, headers);
 
 	        }
